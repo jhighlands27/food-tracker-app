@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Dashboard - Food Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .navbar h1 {
+            font-size: 24px;
+        }
+        
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .navbar-right span {
+            font-size: 14px;
+        }
+        
+        .navbar-right a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 5px;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        
+        .navbar-right a:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        /* Statistics Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .stat-card h3 {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .stat-card .number {
+            font-size: 36px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .stat-card.money .number {
+            color: #4caf50;
+        }
+        
+        .stat-card.waste .number {
+            color: #f44336;
+        }
+        
+        .stat-card .sublabel {
+            font-size: 12px;
+            color: #999;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .btn-primary {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: transform 0.2s;
+            display: inline-block;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            padding: 12px 24px;
+            background: white;
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            border: 2px solid #667eea;
+            transition: all 0.2s;
+            display: inline-block;
+        }
+        
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        /* Search and Filter */
+        .search-filter-section {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .search-box {
+            margin-bottom: 20px;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            padding: 10px 18px;
+            background: #f5f5f5;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .filter-btn:hover {
+            background: #e8e8e8;
+        }
+        
+        .filter-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .section h2 {
+            color: #333;
+            font-size: 22px;
+        }
+        
+        .count-badge {
+            background: #f5f5f5;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+        }
+        
+        .food-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        
+        .food-card {
+            background: #fff;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        
+        .food-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .food-card.expired {
+            border-color: #000;
+            background: #2a2a2a;
+            color: white;
+        }
+        
+        .food-card.expired h3 {
+            color: white;
+        }
+        
+        .food-card.expired .food-details {
+            color: #ccc;
+        }
+        
+        .food-card.expiring-soon {
+            border-color: #ff9800;
+            background: #fff3e0;
+        }
+        
+        .food-card h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        
+        .food-image {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .food-details {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        
+        .food-details p {
+            margin: 5px 0;
+        }
+        
+        .expiry-info {
+            font-weight: 600;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 15px;
+        }
+        
+        .expiry-info.expired {
+            background: #000;
+            color: white;
+            border: 2px solid #ff0000;
+        }
+        
+        .expiry-info.expiring-soon {
+            background: #ff9800;
+            color: white;
+        }
+        
+        .expiry-info.fresh {
+            background: #4caf50;
+            color: white;
+        }
+        
+        .food-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn-delete, .btn-used {
+            padding: 8px 16px;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.3s;
+            flex: 1;
+        }
+        
+        .btn-delete {
+            background: #f44336;
+        }
+        
+        .btn-delete:hover {
+            background: #da190b;
+        }
+        
+        .btn-used {
+            background: #4caf50;
+        }
+        
+        .btn-used:hover {
+            background: #45a049;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+        
+        .empty-state .icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+        
+        .empty-state h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .empty-state p {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>🍎 Food Tracker</h1>
+        <div class="navbar-right">
+            <span>👤 {{ user.username }}</span>
+            <a href="/statistics">📊 Stats</a>
+            <a href="/notifications">🔔 Notifications</a>
+            <a href="/recipes">📖 Recipes</a>
+            <a href="/scanner">📷 Scanner</a>
+            {% if user.is_admin %}
+            <a href="/admin/dashboard">🛡️ Admin</a>
+            {% endif %}
+            <a href="/logout">Logout</a>
+        </div>
+    </div>
+    
+    <div class="container">
+        <!-- Statistics Dashboard -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total Items</h3>
+                <div class="number">{{ stats.total_items }}</div>
+                <div class="sublabel">All time tracked</div>
+            </div>
+            <div class="stat-card money">
+                <h3>Money Saved</h3>
+                <div class="number">${{ stats.money_saved }}</div>
+                <div class="sublabel">Used before expiry</div>
+            </div>
+            <div class="stat-card waste">
+                <h3>Money Wasted</h3>
+                <div class="number">${{ stats.money_wasted }}</div>
+                <div class="sublabel">Expired items</div>
+            </div>
+            <div class="stat-card">
+                <h3>Waste Rate</h3>
+                <div class="number">{{ stats.waste_percentage }}%</div>
+                <div class="sublabel">{{ stats.expired_items }} of {{ stats.total_items }} items</div>
+            </div>
+        </div>
+        
+        <div class="action-buttons">
+            <a href="/add-item" class="btn-primary">➕ Add Food Item</a>
+            <a href="/scanner" class="btn-secondary">📷 Scan Barcode</a>
+        </div>
+        
+        <!-- Search and Filter Section -->
+        <div class="search-filter-section">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 Search items by name..." onkeyup="filterItems()">
+            </div>
+            <div class="filter-buttons">
+                <button class="filter-btn active" onclick="filterByCategory('all')">All</button>
+                <button class="filter-btn" onclick="filterByCategory('Dairy')">🥛 Dairy</button>
+                <button class="filter-btn" onclick="filterByCategory('Meat')">🥩 Meat</button>
+                <button class="filter-btn" onclick="filterByCategory('Seafood')">🐟 Seafood</button>
+                <button class="filter-btn" onclick="filterByCategory('Vegetables')">🥕 Vegetables</button>
+                <button class="filter-btn" onclick="filterByCategory('Fruits')">🍎 Fruits</button>
+                <button class="filter-btn" onclick="filterByCategory('Bakery')">🍞 Bakery</button>
+                <button class="filter-btn" onclick="filterByCategory('Frozen')">❄️ Frozen</button>
+                <button class="filter-btn" onclick="filterByCategory('Beverages')">🥤 Beverages</button>
+                <button class="filter-btn" onclick="filterByCategory('Other')">📦 Other</button>
+            </div>
+        </div>
+        
+        {% if expired|length > 0 %}
+        <div class="section">
+            <div class="section-header">
+                <h2>⚠️ Expired Items</h2>
+                <span class="count-badge">{{ expired|length }}</span>
+            </div>
+            <div class="food-grid">
+                {% for item in expired %}
+                <div class="food-card expired">
+                    {% if item.image_path %}
+                    <img src="{{ item.image_path }}" alt="{{ item.name }}" class="food-image">
+                    {% endif %}
+                    <h3>{{ item.name }}</h3>
+                    <div class="food-details">
+                        <p><strong>Category:</strong> {{ item.category or 'N/A' }}</p>
+                        <p><strong>Quantity:</strong> {{ item.quantity }}</p>
+                        <p><strong>Expired:</strong> {{ item.expiry_date.strftime('%b %d, %Y') }}</p>
+                        {% if item.price %}
+                        <p><strong>Value:</strong> ${{ "%.2f"|format(item.price) }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="expiry-info expired">
+                        ❌ EXPIRED
+                    </div>
+                    <div class="food-actions">
+                        <form method="POST" action="/item/{{ item.id }}/delete" style="flex: 1;">
+                            <button type="submit" class="btn-delete" onclick="return confirm('Remove this item?')">
+                                🗑️ Remove
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if expiring_soon|length > 0 %}
+        <div class="section">
+            <div class="section-header">
+                <h2>⏰ Expiring Soon (Within 7 Days)</h2>
+                <span class="count-badge">{{ expiring_soon|length }}</span>
+            </div>
+            <div class="food-grid">
+                {% for item in expiring_soon %}
+                <div class="food-card expiring-soon">
+                    {% if item.image_path %}
+                    <img src="{{ item.image_path }}" alt="{{ item.name }}" class="food-image">
+                    {% endif %}
+                    <h3>{{ item.name }}</h3>
+                    <div class="food-details">
+                        <p><strong>Category:</strong> {{ item.category or 'N/A' }}</p>
+                        <p><strong>Quantity:</strong> {{ item.quantity }}</p>
+                        <p><strong>Expires:</strong> {{ item.expiry_date.strftime('%b %d, %Y') }}</p>
+                        {% if item.price %}
+                        <p><strong>Value:</strong> ${{ "%.2f"|format(item.price) }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="expiry-info expiring-soon">
+                        ⚠️ Use within {{ item.days_remaining }} days
+                    </div>
+                    <div class="food-actions">
+                        <form method="POST" action="/item/{{ item.id }}/mark-used" style="flex: 1;">
+                            <button type="submit" class="btn-used">✓ Used</button>
+                        </form>
+                        <form method="POST" action="/item/{{ item.id }}/delete" style="flex: 1;">
+                            <button type="submit" class="btn-delete" onclick="return confirm('Remove this item?')">
+                                🗑️ Remove
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if fresh|length > 0 %}
+        <div class="section">
+            <div class="section-header">
+                <h2>✅ Fresh Items</h2>
+                <span class="count-badge">{{ fresh|length }}</span>
+            </div>
+            <div class="food-grid">
+                {% for item in fresh %}
+                <div class="food-card">
+                    {% if item.image_path %}
+                    <img src="{{ item.image_path }}" alt="{{ item.name }}" class="food-image">
+                    {% endif %}
+                    <h3>{{ item.name }}</h3>
+                    <div class="food-details">
+                        <p><strong>Category:</strong> {{ item.category or 'N/A' }}</p>
+                        <p><strong>Quantity:</strong> {{ item.quantity }}</p>
+                        <p><strong>Expires:</strong> {{ item.expiry_date.strftime('%b %d, %Y') }}</p>
+                        {% if item.price %}
+                        <p><strong>Value:</strong> ${{ "%.2f"|format(item.price) }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="expiry-info fresh">
+                        ✓ Fresh for {{ item.days_remaining }} more days
+                    </div>
+                    <div class="food-actions">
+                        <form method="POST" action="/item/{{ item.id }}/mark-used" style="flex: 1;">
+                            <button type="submit" class="btn-used">✓ Used</button>
+                        </form>
+                        <form method="POST" action="/item/{{ item.id }}/delete" style="flex: 1;">
+                            <button type="submit" class="btn-delete" onclick="return confirm('Remove this item?')">
+                                🗑️ Remove
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if expired|length == 0 and expiring_soon|length == 0 and fresh|length == 0 %}
+        <div class="section">
+            <div class="empty-state">
+                <div class="icon">📦</div>
+                <h3>No food items yet</h3>
+                <p>Start tracking your food to avoid waste!</p>
+                <a href="/add-item" class="btn-primary">Add Your First Item</a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <script>
+        let currentCategory = 'all';
+        
+        function filterItems() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const allCards = document.querySelectorAll('.food-card');
+            let visibleCount = 0;
+            
+            allCards.forEach(card => {
+                const itemName = card.querySelector('h3').textContent.toLowerCase();
+                const itemCategory = card.querySelector('.food-details p').textContent.split(': ')[1].toLowerCase();
+                
+                const matchesSearch = itemName.includes(searchTerm);
+                const matchesCategory = currentCategory === 'all' || itemCategory === currentCategory.toLowerCase();
+                
+                if (matchesSearch && matchesCategory) {
+                    card.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            updateSectionVisibility();
+        }
+        
+        function filterByCategory(category) {
+            currentCategory = category;
+            
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            filterItems();
+        }
+        
+        function updateSectionVisibility() {
+            const sections = document.querySelectorAll('.section');
+            
+            sections.forEach(section => {
+                const visibleCards = section.querySelectorAll('.food-card[style*="display: block"], .food-card:not([style*="display: none"])');
+                const allCards = section.querySelectorAll('.food-card');
+                
+                if (allCards.length > 0 && visibleCards.length === 0) {
+                    section.style.display = 'none';
+                } else if (allCards.length > 0) {
+                    section.style.display = 'block';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

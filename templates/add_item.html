@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Food Item - Food Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .navbar h1 {
+            font-size: 24px;
+        }
+        
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 5px;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        
+        .navbar a:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        
+        .form-card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .form-card h2 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .form-group small {
+            display: block;
+            margin-top: 5px;
+            color: #999;
+            font-size: 12px;
+        }
+        
+        .required {
+            color: #f44336;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            text-decoration: none;
+            display: block;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+        
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
+        
+        .quick-dates {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .quick-date-btn {
+            padding: 8px 16px;
+            background: #f5f5f5;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+        
+        .quick-date-btn:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>🍎 Add Food Item</h1>
+        <a href="/dashboard">← Back to Dashboard</a>
+    </div>
+    
+    <div class="container">
+        <div class="form-card">
+            <h2>📝 Add New Food Item</h2>
+            
+            <form method="POST" action="/add-item">
+                <div class="form-group">
+                    <label for="name">Food Name <span class="required">*</span></label>
+                    <input type="text" id="name" name="name" required placeholder="e.g., Milk, Eggs, Chicken">
+                </div>
+                
+                <div class="form-group">
+                    <label for="category">Category</label>
+                    <select id="category" name="category">
+                        <option value="">Select a category</option>
+                        <option value="Dairy">🥛 Dairy</option>
+                        <option value="Meat">🥩 Meat</option>
+                        <option value="Seafood">🐟 Seafood</option>
+                        <option value="Vegetables">🥕 Vegetables</option>
+                        <option value="Fruits">🍎 Fruits</option>
+                        <option value="Bakery">🍞 Bakery</option>
+                        <option value="Frozen">❄️ Frozen</option>
+                        <option value="Canned">🥫 Canned</option>
+                        <option value="Beverages">🥤 Beverages</option>
+                        <option value="Other">📦 Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="quantity">Quantity <span class="required">*</span></label>
+                    <input type="number" id="quantity" name="quantity" value="1" min="1" required>
+                    <small>How many units do you have?</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="expiry_date">Expiration Date <span class="required">*</span></label>
+                    <input type="date" id="expiry_date" name="expiry_date" required>
+                    <div class="quick-dates">
+                        <button type="button" class="quick-date-btn" onclick="setQuickDate(3)">3 days</button>
+                        <button type="button" class="quick-date-btn" onclick="setQuickDate(7)">1 week</button>
+                        <button type="button" class="quick-date-btn" onclick="setQuickDate(14)">2 weeks</button>
+                        <button type="button" class="quick-date-btn" onclick="setQuickDate(30)">1 month</button>
+                        <button type="button" class="quick-date-btn" onclick="setQuickDate(90)">3 months</button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="barcode">Barcode (Optional)</label>
+                    <input type="text" id="barcode" name="barcode" placeholder="Enter barcode number">
+                </div>
+                
+                <div class="button-group">
+                    <a href="/dashboard" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary">✓ Add Item</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        function setQuickDate(days) {
+            const today = new Date();
+            const expiryDate = new Date(today.getTime() + (days * 24 * 60 * 60 * 1000));
+            const dateString = expiryDate.toISOString().split('T')[0];
+            document.getElementById('expiry_date').value = dateString;
+        }
+        
+        // Set minimum date to today
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('expiry_date').setAttribute('min', today);
+    </script>
+</body>
+</html>

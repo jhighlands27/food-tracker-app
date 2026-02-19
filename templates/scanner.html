@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barcode Scanner - Food Tracker</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .navbar h1 {
+            font-size: 24px;
+        }
+        
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 5px;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        
+        .navbar a:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        
+        .scanner-card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .scanner-card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 28px;
+            text-align: center;
+        }
+        
+        .instructions {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            color: #1976d2;
+        }
+        
+        .instructions h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        .instructions ol {
+            margin-left: 20px;
+        }
+        
+        .instructions li {
+            margin: 5px 0;
+        }
+        
+        #scanner-container {
+            width: 100%;
+            max-width: 640px;
+            margin: 0 auto 30px;
+            border-radius: 15px;
+            overflow: hidden;
+            background: #000;
+            position: relative;
+        }
+        
+        #interactive {
+            width: 100%;
+            height: auto;
+        }
+        
+        #interactive video {
+            width: 100%;
+            height: auto;
+        }
+        
+        .scanner-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+        }
+        
+        .scanner-line {
+            position: absolute;
+            width: 80%;
+            height: 2px;
+            background: #4caf50;
+            left: 10%;
+            top: 50%;
+            animation: scan 2s ease-in-out infinite;
+        }
+        
+        @keyframes scan {
+            0%, 100% { top: 20%; }
+            50% { top: 80%; }
+        }
+        
+        .result-card {
+            background: #f5f5f5;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .result-card.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .result-card h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+        
+        .barcode-display {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            text-decoration: none;
+            display: block;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+        
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
+        
+        .start-button {
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        
+        .start-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+        }
+        
+        .manual-entry {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px dashed #e0e0e0;
+        }
+        
+        .manual-entry input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>📷 Barcode Scanner</h1>
+        <a href="/dashboard">← Back to Dashboard</a>
+    </div>
+    
+    <div class="container">
+        <div class="scanner-card">
+            <h2>📦 Scan Product Barcode</h2>
+            
+            <div class="instructions">
+                <h3>How to scan:</h3>
+                <ol>
+                    <li>Click "Start Scanner" button below</li>
+                    <li>Allow camera access when prompted</li>
+                    <li>Point camera at barcode</li>
+                    <li>Hold steady until detected</li>
+                </ol>
+            </div>
+            
+            <button class="start-button" onclick="startScanner()" id="startBtn">
+                🎥 Start Scanner
+            </button>
+            
+            <div id="scanner-container" style="display: none;">
+                <div id="interactive" class="viewport">
+                    <div class="scanner-overlay">
+                        <div class="scanner-line"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="result-card" id="resultCard">
+                <h3>✓ Barcode Detected!</h3>
+                <div class="barcode-display" id="barcodeDisplay"></div>
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="resetScanner()">Scan Again</button>
+                    <a href="#" class="btn btn-primary" id="addItemBtn">Add This Item</a>
+                </div>
+            </div>
+            
+            <div class="manual-entry">
+                <p style="color: #666; margin-bottom: 15px;">Can't scan? Enter barcode manually:</p>
+                <form action="/add-item" method="GET">
+                    <input type="text" name="barcode" placeholder="Enter barcode number" pattern="[0-9]+" maxlength="13">
+                    <button type="submit" class="btn btn-primary">Continue to Add Item</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let scanning = false;
+        
+        function startScanner() {
+            document.getElementById('startBtn').style.display = 'none';
+            document.getElementById('scanner-container').style.display = 'block';
+            scanning = true;
+            
+            Quagga.init({
+                inputStream: {
+                    name: "Live",
+                    type: "LiveStream",
+                    target: document.querySelector('#interactive'),
+                    constraints: {
+                        width: 640,
+                        height: 480,
+                        facingMode: "environment"
+                    },
+                },
+                decoder: {
+                    readers: [
+                        "ean_reader",
+                        "ean_8_reader",
+                        "upc_reader",
+                        "upc_e_reader",
+                        "code_128_reader",
+                        "code_39_reader"
+                    ]
+                },
+            }, function(err) {
+                if (err) {
+                    console.error(err);
+                    alert("Error accessing camera. Please check permissions.");
+                    return;
+                }
+                Quagga.start();
+            });
+            
+            Quagga.onDetected(onBarcodeDetected);
+        }
+        
+        function onBarcodeDetected(result) {
+            if (!scanning) return;
+            
+            const code = result.codeResult.code;
+            console.log("Barcode detected:", code);
+            
+            // Stop scanning
+            scanning = false;
+            Quagga.stop();
+            
+            // Show result
+            document.getElementById('barcodeDisplay').textContent = code;
+            document.getElementById('resultCard').classList.add('show');
+            document.getElementById('addItemBtn').href = `/add-item?barcode=${code}`;
+            
+            // Play success sound (optional)
+            playBeep();
+        }
+        
+        function resetScanner() {
+            document.getElementById('resultCard').classList.remove('show');
+            document.getElementById('scanner-container').style.display = 'none';
+            document.getElementById('startBtn').style.display = 'block';
+        }
+        
+        function playBeep() {
+            // Create a simple beep sound
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = 800;
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.1);
+        }
+    </script>
+</body>
+</html>
