@@ -20,13 +20,12 @@ import shutil
 app = FastAPI()
 app.add_middleware(SessionMiddleware, secret_key="your-secret-key-change-this-in-production")
 
-# Create uploads folder for images
+# Create necessary folders
 os.makedirs("uploads", exist_ok=True)
+os.makedirs("static", exist_ok=True)
 
-# Only mount static if directory exists
-if os.path.exists("static"):
-    app.mount("/static", StaticFiles(directory="static"), name="static")
-
+# Mount static files
+app.mount("/static", StaticFiles(directory="static"), name="static")
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 templates = Jinja2Templates(directory="templates")
