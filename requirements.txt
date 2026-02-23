@@ -4,3 +4,4 @@ sqlalchemy
 python-multipart
 jinja2
 pillow
+itsdangerous
